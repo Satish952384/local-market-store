@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Local Market Online Store - A marketplace connecting small local vendors with customers. Browse fresh groceries, electronics, handicrafts and more.">
+  <title>Local Market | Online Store for Small Vendors</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+</head>
+<body>
+
+  <!-- ═══ Navbar ═══ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand" onclick="App.navigate('home')">
+      <span>🏪</span> LocalMarket
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a class="nav-link active" data-page="home" onclick="App.navigate('home')">Home</a>
+      <a class="nav-link" data-page="products" onclick="App.navigate('products')">Products</a>
+      <a class="nav-link" data-page="shops" onclick="App.navigate('shops')">Shops</a>
+    </div>
+    <div class="nav-actions">
+      <button class="cart-btn" id="cartToggleBtn" onclick="Cart.toggle()" style="display:none">
+        🛒 <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <!-- Logged out -->
+      <div id="authButtons">
+        <button class="btn btn-primary btn-sm" onclick="App.navigate('login')">Sign In</button>
+      </div>
+      <!-- Logged in -->
+      <div class="user-menu" id="userMenu" style="display:none">
+        <button class="user-btn" onclick="App.toggleUserMenu()">
+          👤 <span class="user-name" id="userName">User</span> ▾
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-item" onclick="App.navigate('profile')">👤 My Profile</div>
+          <div class="dropdown-item" id="navDashboard" onclick="App.navigate('dashboard')" style="display:none">📊 Dashboard</div>
+          <div class="dropdown-item" id="navOrders" onclick="App.navigate('orders')">📦 My Orders</div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" onclick="Auth.logout()">🚪 Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ Toast Container ═══ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ═══ Cart Overlay ═══ -->
+  <div class="cart-overlay" id="cartOverlay" onclick="Cart.close()"></div>
+
+  <!-- ═══ Cart Sidebar ═══ -->
+  <div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-sidebar-header">
+      <h3>🛒 Your Cart</h3>
+      <button class="modal-close" onclick="Cart.close()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">₹0</span>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="Cart.checkout()">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- ═══ Main Content ═══ -->
+  <main class="main-content">
+
+    <!-- ──── HOME PAGE ──── -->
+    <div class="page-view active" id="page-home">
+      <div class="container">
+        <section class="hero">
+          <h1>Discover <span class="gradient-text">Local Treasures</span><br>From Vendors Near You</h1>
+          <p>Support small businesses in your community. Fresh groceries, unique handicrafts, latest electronics — all from trusted local vendors.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="App.navigate('products')">🛍️ Browse Products</button>
+            <button class="btn btn-outline" onclick="App.navigate('shops')">🏪 Explore Shops</button>
+          </div>
+        </section>
+        <h2 class="section-title">Featured Products</h2>
+        <div class="cards-grid" id="featuredProducts"><div class="loading"><div class="spinner"></div></div></div>
+        <h2 class="section-title">Popular Shops</h2>
+        <div class="cards-grid" id="featuredShops"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- ──── PRODUCTS PAGE ──── -->
+    <div class="page-view" id="page-products">
+      <div class="container">
+        <h2 class="section-title">All Products</h2>
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <input type="text" id="searchInput" placeholder="Search products..." oninput="Products.search()">
+          </div>
+          <select class="filter-select" id="categoryFilter" onchange="Products.filter()">
+            <option value="all">All Categories</option>
+            <option value="grocery">🥬 Grocery</option>
+            <option value="electronics">💻 Electronics</option>
+            <option value="handicrafts">🎨 Handicrafts</option>
+            <option value="clothing">👗 Clothing</option>
+            <option value="food">🍕 Food</option>
+            <option value="books">📚 Books</option>
+            <option value="health">💊 Health</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+        <div class="cards-grid" id="productsList"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- ──── PRODUCT DETAIL PAGE ──── -->
+    <div class="page-view" id="page-product-detail">
+      <div class="container">
+        <div class="product-detail" id="productDetail"></div>
+      </div>
+    </div>
+
+    <!-- ──── SHOPS PAGE ──── -->
+    <div class="page-view" id="page-shops">
+      <div class="container">
+        <h2 class="section-title">All Shops</h2>
+        <div class="cards-grid" id="shopsList"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- ──── SHOP DETAIL PAGE ──── -->
+    <div class="page-view" id="page-shop-detail">
+      <div class="container" id="shopDetail"></div>
+    </div>
+
+    <!-- ──── LOGIN PAGE ──── -->
+    <div class="page-view" id="page-login">
+      <div class="auth-container">
+        <h2>Welcome Back</h2>
+        <p class="auth-sub">Sign in to your account</p>
+        <form id="loginForm" onsubmit="Auth.login(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign In</button>
+        </form>
+        <p class="auth-switch">Don't have an account? <a onclick="App.navigate('signup')">Create one</a></p>
+      </div>
+    </div>
+
+    <!-- ──── SIGNUP PAGE ──── -->
+    <div class="page-view" id="page-signup">
+      <div class="auth-container">
+        <h2>Create Account</h2>
+        <p class="auth-sub">Join the marketplace today</p>
+        <form id="signupForm" onsubmit="Auth.signup(event)">
+          <div class="form-group">
+            <label for="signupName">Full Name</label>
+            <input type="text" id="signupName" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label for="signupEmail">Email Address</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" placeholder="Min 6 characters" required minlength="6">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signupRole">Account Type</label>
+              <select id="signupRole">
+                <option value="customer">Customer</option>
+                <option value="vendor">Vendor</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="signupPhone">Phone (optional)</label>
+              <input type="text" id="signupPhone" placeholder="+91 98765 43210">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signupAddress">Address (optional)</label>
+            <input type="text" id="signupAddress" placeholder="Your address">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="signupBtn">Create Account</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a onclick="App.navigate('login')">Sign in</a></p>
+      </div>
+    </div>
+
+    <!-- ──── PROFILE PAGE ──── -->
+    <div class="page-view" id="page-profile">
+      <div class="container">
+        <div class="auth-container" style="max-width:520px">
+          <h2>My Profile</h2>
+          <p class="auth-sub" id="profileRole">Customer Account</p>
+          <form id="profileForm" onsubmit="Auth.updateProfile(event)">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" id="profileName" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profileEmail" disabled>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="profilePhone">
+              </div>
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="profileAddress">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──── ORDERS PAGE ──── -->
+    <div class="page-view" id="page-orders">
+      <div class="container">
+        <h2 class="section-title">My Orders</h2>
+        <div id="ordersList"></div>
+      </div>
+    </div>
+
+    <!-- ──── VENDOR DASHBOARD ──── -->
+    <div class="page-view" id="page-dashboard">
+      <div class="container dashboard">
+        <div class="dashboard-header">
+          <h2>📊 Vendor Dashboard</h2>
+        </div>
+        <div class="stats-grid" id="dashboardStats"></div>
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="Dashboard.switchTab('shop',this)">🏪 My Shop</button>
+          <button class="tab-btn" onclick="Dashboard.switchTab('products',this)">📦 Products</button>
+          <button class="tab-btn" onclick="Dashboard.switchTab('orders',this)">📋 Orders</button>
+        </div>
+        <div id="dashboardContent"></div>
+      </div>
+    </div>
+
+    <!-- ──── CHECKOUT PAGE ──── -->
+    <div class="page-view" id="page-checkout">
+      <div class="container">
+        <div class="auth-container" style="max-width:560px">
+          <h2>Checkout</h2>
+          <p class="auth-sub">Complete your order</p>
+          <div id="checkoutItems" style="margin-bottom:1.5rem"></div>
+          <form id="checkoutForm" onsubmit="Cart.placeOrder(event)">
+            <div class="form-group">
+              <label for="shippingAddress">Shipping Address</label>
+              <textarea id="shippingAddress" placeholder="Enter your full shipping address" required></textarea>
+            </div>
+            <div class="cart-total" style="margin-bottom:1rem">
+              <span>Order Total</span>
+              <span id="checkoutTotal">₹0</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="placeOrderBtn">🛍️ Place Order</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ Modal ═══ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <!-- ═══ Footer ═══ -->
+  <footer class="footer">
+    <p>© 2024 LocalMarket — Empowering small vendors, connecting communities.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
